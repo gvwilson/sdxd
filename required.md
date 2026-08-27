@@ -1,37 +1,50 @@
+# Library Requirements
+
+This file lists the Python functions and modules used by the examples in
+*Software Design by Example in Python* to interact with the file system and the
+network, and whether an equivalent exists in the Dafny standard library (enabled
+with `--standard-libraries`).
+
+Dafny's standard library provides only whole-file I/O (`Std.FileIO`) and JSON
+(`Std.JSON`) for the capabilities below. It has no networking, hashing, SQLite,
+CSV/YAML, temporary-file, or path-manipulation support. `Std.FileIO` reads or
+writes an entire file in a single call; there are no open/close file handles or
+streaming reads.
+
 ## Standard streams
 
 - `sys.stdin` (read)
-  - missing
+  - missing (no standard-input support)
 - `sys.stdout` (write)
-  - exists: `print`
+  - exists: `print` (writes to standard output)
 - `sys.stderr` (write)
   - missing
 
 ## File operations
 
 - `open(path, mode)`: text and binary modes (`"r"`, `"w"`, `"rb"`)
-  - missing
+  - missing (no file handles; `Std.FileIO` operates on whole files)
 - `file.close()`: when `open()` isn't used with a context manager `with`
   - missing
 - `file.read()`: read whole file
-  - exists: `Std.FileIO.ReadUTF8FromFile`
+  - exists: `Std.FileIO.ReadUTF8FromFile` (text) or `Std.FileIO.ReadBytesFromFile` (bytes)
 - `file.read(n)`: fixed-size streaming blocks
-  - missing
+  - missing (`Std.FileIO` is whole-file only)
 - `file.readlines()`: read all lines
   - missing
 - `file.write(text)`: save characters to file
-  - exists: `Std.FileIO.WriteUTF8ToFile`
+  - exists: `Std.FileIO.WriteUTF8ToFile` (text) or `Std.FileIO.WriteBytesToFile` (bytes)
 - `print(..., file=handle)`: write text to a file handle
   - missing
 
 ## Path manipulation
 
 - `Path(...)`: string to path
-  - missing
+  - missing (paths are plain `string`s passed to `Std.FileIO`)
 - `Path.cwd()`: where am I?
   - missing
 - `Path.joinpath()`: combine paths
-  - missing
+  - missing (path strings are concatenated with `/` or `+`)
 - `Path.parent`: get path components
   - missing
 - `Path.stem`: get path components
@@ -51,7 +64,7 @@
 - `Path.touch()`: ensure existence
   - missing
 - `Path.mkdir()` (including `parents=True, exist_ok=True`): create directories
-  - missing
+  - partial: `Std.FileIO.WriteUTF8ToFile`/`WriteBytesToFile` create nonexistent parent directories; there is no standalone `mkdir`
 - `Path.unlink()`: delete file
   - missing
 - `Path.rmdir()`: delete directory
@@ -75,9 +88,9 @@
 ## Serialization
 
 - JSON: `json.load()`
-  - exists: `Std.JSON.API.Deserialize`
+  - exists: `Std.JSON.API.Deserialize` (from `seq<byte>`, not from a file or string)
 - JSON: `json.dump()`
-  - exists: `Std.JSON.API.Serialize`
+  - exists: `Std.JSON.API.Serialize` (to `seq<byte>`; `SerializeAlloc` returns an `array<byte>`)
 - CSV: `csv.reader()`
   - missing
 - CSV: `csv.writerow()`
@@ -98,7 +111,7 @@
 ## Hashing
 
 - `hashlib.sha256().hexdigest()`: whole-file digest
-  - missing
+  - missing (the standard library has `Std.Base64`, but no SHA/MD5)
 - `hashlib.md5()` with `.update()`: streaming hash over fixed-size blocks
   - missing
 
