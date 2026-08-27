@@ -1,0 +1,8 @@
+// find the error in the following proof attempt
+{{ x == 0 }}
+{{ x == 0 && y == 6 }} // `y == 6` is unjustified given `x == 0`
+x := x + 2
+{{ x == 2 && y == 6 }}
+{{ x + y == 8 }}
+y := x + y
+{{ y == 8 }}
